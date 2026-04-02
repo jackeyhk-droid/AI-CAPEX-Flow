@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AI CAPEX Flow Map | AI 資本開支流向圖</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+:root{--bg:#0a0e17;--bg-card:#111827;--bg-card-hover:#1a2332;--bg-modal:rgba(15,21,32,0.88);--border:#1e293b;--border-active:#334155;--text:#e2e8f0;--text-dim:#94a3b8;--text-muted:#64748b;--accent-blue:#3b82f6;--accent-cyan:#06b6d4;--accent-green:#10b981;--accent-amber:#f59e0b;--accent-red:#ef4444;--accent-purple:#a855f7;--accent-pink:#ec4899;--accent-orange:#f97316;--accent-teal:#14b8a6;--accent-gold:#d4a017;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow:hidden;height:100vh;}
+
+/* === PASSWORD GATE === */
+#gate{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity 0.5s,visibility 0.5s;}
+#gate.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+.gate-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:48px 44px 40px;width:380px;max-width:90vw;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+.gate-lock{font-size:48px;margin-bottom:16px;}
+.gate-card h2{font-family:'Inter',sans-serif;font-size:24px;font-weight:800;margin-bottom:6px;background:linear-gradient(135deg,#06b6d4,#3b82f6,#a855f7,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:300% 300%;animation:gradShift 4s ease infinite;}
+.gate-card .gate-sub{font-size:13px;color:var(--text-muted);margin-bottom:28px;font-family:'Inter',sans-serif;}
+.gate-card input{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:14px 20px;border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:14px;width:100%;text-align:center;outline:none;letter-spacing:2px;transition:border-color 0.3s;margin-bottom:16px;}
+.gate-card input::placeholder{letter-spacing:1px;font-size:13px;color:var(--text-muted);}
+.gate-card input:focus{border-color:var(--accent-cyan);}
+.gate-card input.error{border-color:var(--accent-red);animation:shake 0.4s ease;}
+.gate-btn{width:100%;padding:14px;border:none;border-radius:10px;background:linear-gradient(135deg,#10b981,#06b6d4);color:#0a0e17;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;cursor:pointer;transition:opacity 0.2s,transform 0.2s;letter-spacing:0.5px;}
+.gate-btn:hover{opacity:0.9;transform:translateY(-1px);}
+.gate-btn:active{transform:translateY(0);}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
+
+/* === HEADER === */
+.header{padding:16px 28px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;background:var(--bg);position:relative;z-index:200;}
+.header-left h1{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;background:linear-gradient(90deg,#06b6d4,#3b82f6,#a855f7,#ec4899,#f59e0b,#06b6d4);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradShift 6s linear infinite;}
+@keyframes gradShift{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+.header-left .subtitle{font-size:11px;color:var(--text-muted);margin-top:2px;font-family:'JetBrains Mono',monospace;}
+.header-right{display:flex;gap:10px;align-items:center;}
+.search-box input{background:var(--bg-card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:10px;outline:none;width:160px;transition:all 0.2s;}
+.search-box input:focus{border-color:var(--accent-cyan);box-shadow:0 0 8px rgba(6,182,212,0.15);}
+.lang-toggle{background:var(--bg-card);border:1px solid var(--border);color:var(--text-dim);padding:6px 10px;border-radius:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;transition:all 0.2s;}
+.lang-toggle:hover{border-color:var(--accent-cyan);color:var(--accent-cyan);}
+
+/* === LEGEND (interactive) === */
+.legend-bar{display:flex;gap:10px;padding:5px 28px 6px;border-bottom:1px solid var(--border);flex-wrap:wrap;background:var(--bg);position:relative;z-index:200;}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid transparent;transition:all 0.2s;user-select:none;}
+.legend-item:hover{color:var(--text);border-color:var(--border);}
+.legend-item.active{border-color:var(--border-active);color:var(--text);background:rgba(255,255,255,0.03);}
+.legend-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+/* === CANVAS === */
+.canvas-container{width:100%;height:calc(100vh - 88px);overflow:hidden;position:relative;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;}
+.canvas-container:active{cursor:grabbing;}
+.canvas{position:absolute;top:0;left:0;width:3600px;height:2200px;background-image:radial-gradient(rgba(30,41,59,0.4) 1px,transparent 1px);background-size:40px 40px;transform-origin:0 0;}
+.connections-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}
+.conn-line{stroke-width:1.5;fill:none;opacity:0.25;stroke-linecap:round;stroke-linejoin:round;transition:opacity 0.3s,stroke-width 0.3s,filter 0.3s;stroke-dasharray:10 6;animation:flowD 1.2s linear infinite;}
+@keyframes flowD{to{stroke-dashoffset:-32;}}
+.conn-line.highlight{opacity:0.9;stroke-width:2.5;filter:drop-shadow(0 0 4px currentColor);stroke-dasharray:14 6;animation-duration:0.7s;}
+.conn-line.dim{opacity:0.03;animation:none;}
+
+.node{position:absolute;border-radius:10px;cursor:pointer;transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1.5px solid var(--border);backdrop-filter:blur(6px);background:var(--bg-card);outline:none;}
+.node:hover,.node:focus-visible{transform:scale(1.08);z-index:10;}
+.node:focus-visible{box-shadow:0 0 0 3px rgba(6,182,212,0.4);}
+.node.filtered-out{opacity:0.06!important;pointer-events:none;transform:scale(0.92)!important;}
+.node-center{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#1a2744,#0a0e17);border:2px solid var(--accent-cyan);box-shadow:0 0 35px rgba(6,182,212,0.2),inset 0 0 25px rgba(6,182,212,0.07);animation:pulse 3s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 35px rgba(6,182,212,0.2),inset 0 0 25px rgba(6,182,212,0.07);}50%{box-shadow:0 0 55px rgba(6,182,212,0.35),inset 0 0 35px rgba(6,182,212,0.12);}}
+.node-center .node-ticker{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--accent-cyan);}
+.node-center .node-name{font-size:10px;color:var(--text-dim);margin-top:5px;line-height:1.4;padding:0 12px;}
+.node-cluster-label{position:absolute;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;z-index:4;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(10,14,23,0.7);backdrop-filter:blur(4px);}
+.node-company{width:138px;height:76px;padding:6px;}
+.cat-hyperscaler.node-company{width:146px;height:80px;border-width:2px;}
+.node-company .node-ticker{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;}
+.node-company .node-name{font-size:9px;color:var(--text-muted);margin-top:1px;}
+.node-company .node-mcap{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);margin-top:2px;}
+.capex-magnitude{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--accent-amber);margin-top:1px;font-weight:600;}
+
+.cat-hyperscaler{border-color:var(--accent-amber);}.cat-hyperscaler .node-ticker{color:var(--accent-amber);}
+.cat-gpu{border-color:var(--accent-green);}.cat-gpu .node-ticker{color:var(--accent-green);}
+.cat-foundry{border-color:var(--accent-blue);}.cat-foundry .node-ticker{color:var(--accent-blue);}
+.cat-memory{border-color:var(--accent-purple);}.cat-memory .node-ticker{color:var(--accent-purple);}
+.cat-equipment{border-color:var(--accent-red);}.cat-equipment .node-ticker{color:var(--accent-red);}
+.cat-networking{border-color:var(--accent-cyan);}.cat-networking .node-ticker{color:var(--accent-cyan);}
+.cat-power{border-color:var(--accent-orange);}.cat-power .node-ticker{color:var(--accent-orange);}
+.cat-cooling{border-color:var(--accent-pink);}.cat-cooling .node-ticker{color:var(--accent-pink);}
+.cat-oem{border-color:var(--accent-teal);}.cat-oem .node-ticker{color:var(--accent-teal);}
+.cat-sovereign{border-color:var(--accent-gold);}.cat-sovereign .node-ticker{color:var(--accent-gold);}
+
+/* hover glow per category */
+.cat-hyperscaler:hover{box-shadow:0 0 20px rgba(245,158,11,0.2);}.cat-gpu:hover{box-shadow:0 0 20px rgba(16,185,129,0.2);}.cat-foundry:hover{box-shadow:0 0 20px rgba(59,130,246,0.2);}.cat-memory:hover{box-shadow:0 0 20px rgba(168,85,247,0.2);}.cat-equipment:hover{box-shadow:0 0 20px rgba(239,68,68,0.2);}.cat-networking:hover{box-shadow:0 0 20px rgba(6,182,212,0.2);}.cat-power:hover{box-shadow:0 0 20px rgba(249,115,22,0.2);}.cat-cooling:hover{box-shadow:0 0 20px rgba(236,72,153,0.2);}.cat-oem:hover{box-shadow:0 0 20px rgba(20,184,166,0.2);}.cat-sovereign:hover{box-shadow:0 0 20px rgba(212,160,23,0.2);}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:1000;backdrop-filter:blur(6px);justify-content:center;align-items:center;}
+.modal-overlay.active{display:flex;}
+.modal{background:var(--bg-modal);border:1px solid var(--border-active);box-shadow:0 16px 40px rgba(0,0,0,0.5);border-radius:14px;width:680px;max-width:95vw;max-height:88vh;overflow-y:auto;padding:24px;position:relative;animation:mIn 0.3s cubic-bezier(0.16,1,0.3,1);}
+@keyframes mIn{from{opacity:0;transform:scale(0.95) translateY(16px);}to{opacity:1;transform:none;}}
+.modal-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-dim);width:30px;height:30px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.2s;}
+.modal-close:hover{background:rgba(239,68,68,0.1);border-color:var(--accent-red);color:var(--accent-red);}
+.modal-header{display:flex;align-items:baseline;gap:10px;margin-bottom:3px;}
+.modal-ticker{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:800;}
+.modal-name{font-size:13px;color:var(--text-dim);}
+.modal-name-tc{font-size:11px;color:var(--text-muted);margin-bottom:16px;}
+.modal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.modal-stat{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;padding:10px;}
+.modal-stat-label{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.modal-stat-value{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;}
+.modal-section{margin-bottom:16px;}
+.modal-section-title{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.modal-section p{font-size:12px;line-height:1.7;color:var(--text-dim);}
+.capex-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:11px;}
+.capex-table th{text-align:left;color:var(--text-muted);font-weight:600;padding:5px 8px;border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:1px;}
+.capex-table td{padding:7px 8px;color:var(--text-dim);border-bottom:1px solid rgba(30,41,59,0.5);}
+.capex-bar-cell{position:relative;width:38%;}
+.capex-bar{position:absolute;top:4px;left:0;height:calc(100% - 8px);border-radius:3px;opacity:0.2;transition:width 0.6s cubic-bezier(0.16,1,0.3,1);}
+.yoy-badge{display:inline-block;font-size:8px;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:600;}
+.yoy-up{background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);}
+.yoy-down{background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.2);}
+.customer-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.company-link-tag{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 8px;border-radius:5px;background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:4px;}
+.company-link-tag .tag-arrow{font-size:8px;opacity:0;transition:all 0.2s;}
+.company-link-tag:hover{transform:translateY(-1px);}.company-link-tag:hover .tag-arrow{opacity:1;}
+.company-link-tag[data-cat="hyperscaler"]:hover{border-color:var(--accent-amber);color:var(--accent-amber);background:rgba(245,158,11,0.06);}
+.company-link-tag[data-cat="gpu"]:hover{border-color:var(--accent-green);color:var(--accent-green);background:rgba(16,185,129,0.06);}
+.company-link-tag[data-cat="foundry"]:hover{border-color:var(--accent-blue);color:var(--accent-blue);background:rgba(59,130,246,0.06);}
+.company-link-tag[data-cat="memory"]:hover{border-color:var(--accent-purple);color:var(--accent-purple);background:rgba(168,85,247,0.06);}
+.company-link-tag[data-cat="equipment"]:hover{border-color:var(--accent-red);color:var(--accent-red);background:rgba(239,68,68,0.06);}
+.company-link-tag[data-cat="networking"]:hover{border-color:var(--accent-cyan);color:var(--accent-cyan);background:rgba(6,182,212,0.06);}
+.company-link-tag[data-cat="power"]:hover{border-color:var(--accent-orange);color:var(--accent-orange);background:rgba(249,115,22,0.06);}
+.company-link-tag[data-cat="cooling"]:hover{border-color:var(--accent-pink);color:var(--accent-pink);background:rgba(236,72,153,0.06);}
+.company-link-tag[data-cat="oem"]:hover{border-color:var(--accent-teal);color:var(--accent-teal);background:rgba(20,184,166,0.06);}
+.company-link-tag[data-cat="sovereign"]:hover{border-color:var(--accent-gold);color:var(--accent-gold);background:rgba(212,160,23,0.06);}
+.tag-cat-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;}
+.na-label{color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:10px;font-style:italic;}
+
+#tooltip{position:fixed;z-index:500;pointer-events:none;background:rgba(10,14,23,0.92);border:1px solid var(--border-active);border-radius:8px;padding:10px 14px;max-width:260px;backdrop-filter:blur(10px);box-shadow:0 6px 20px rgba(0,0,0,0.5);opacity:0;transform:translateY(4px);transition:opacity 0.2s,transform 0.2s;font-family:'JetBrains Mono',monospace;}
+#tooltip.visible{opacity:1;transform:translateY(0);}
+#tooltip .tt-ticker{font-size:13px;font-weight:800;margin-bottom:2px;}
+#tooltip .tt-capex{font-size:10px;color:var(--accent-amber);margin-bottom:3px;}
+#tooltip .tt-thesis{font-size:9px;color:var(--text-dim);line-height:1.4;}
+
+#minimap{position:fixed;bottom:24px;left:24px;width:200px;height:120px;background:rgba(10,14,23,0.85);border:1px solid var(--border);border-radius:8px;z-index:100;overflow:hidden;backdrop-filter:blur(4px);box-shadow:0 4px 12px rgba(0,0,0,0.4);cursor:crosshair;touch-action:none;}
+#minimap canvas{width:100%;height:100%;pointer-events:none;}
+
+.zoom-controls{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:5px;z-index:100;}
+.zoom-btn{width:34px;height:34px;background:rgba(17,24,39,0.85);backdrop-filter:blur(4px);border:1px solid var(--border);color:var(--text-dim);border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;font-family:'JetBrains Mono',monospace;transition:all 0.2s;box-shadow:0 3px 10px rgba(0,0,0,0.3);}
+.zoom-btn:hover{border-color:var(--accent-cyan);color:var(--accent-cyan);}
+.zoom-pct{text-align:center;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:-1px;}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.tc-text{display:none;}body.lang-tc .en-text{display:none;}body.lang-tc .tc-text{display:inline;}
+</style>
+</head>
+<body>
+<!-- PASSWORD GATE -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-lock">🔒</div>
+    <h2>AI CAPEX Flow Map</h2>
+    <div class="gate-sub">Enter password to access.</div>
+    <input type="password" id="gatePw" placeholder="Enter access code" autofocus>
+    <button class="gate-btn" onclick="tryUnlock()">Unlock Dashboard</button>
+  </div>
+</div>
+
+<div class="header">
+  <div class="header-left">
+    <h1><span class="en-text">AI CAPEX FLOW MAP</span><span class="tc-text">AI 資本開支流向圖</span></h1>
+    <div class="subtitle"><span class="en-text">The Selling Shovels Supply Chain — Follow the Money</span><span class="tc-text">賣鏟子供應鏈 — 追蹤資金流向</span></div>
+  </div>
+  <div class="header-right">
+    <div class="search-box"><input type="text" id="searchInput" placeholder="Search..." oninput="debouncedSearch()"></div>
+    <button class="lang-toggle" onclick="toggleLang()">EN / 繁中</button>
+  </div>
+</div>
+<div class="legend-bar" id="legendBar"></div>
+
+<div class="canvas-container" id="cc">
+  <div class="canvas" id="canvas">
+    <svg class="connections-svg" id="svg">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 1L10 5L0 9z" fill="currentColor" opacity="0.4"/></marker>
+        <marker id="ahH" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 1L10 5L0 9z" fill="currentColor" opacity="0.75"/></marker>
+      </defs>
+    </svg>
+  </div>
+</div>
+
+<div id="tooltip"><div class="tt-ticker"></div><div class="tt-capex"></div><div class="tt-thesis"></div></div>
+<div id="minimap"><canvas id="mmCanvas" width="400" height="240"></canvas></div>
+<div class="modal-overlay" id="mo" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal"></div></div>
+<div class="zoom-controls">
+  <button class="zoom-btn" onclick="zoomAt(0.08)">+</button>
+  <button class="zoom-btn" onclick="zoomAt(-0.08)">−</button>
+  <button class="zoom-btn" onclick="fitToView()" title="Fit all" style="font-size:12px;">⛶</button>
+  <button class="zoom-btn" onclick="resetView()" style="font-size:12px;">⟲</button>
+  <div class="zoom-pct" id="zoomPct">50%</div>
+</div>
+
+<script>
+// ═══════════════════════════════════
+// PASSWORD GATE
+// ═══════════════════════════════════
+const PASSWORD='23008133';
+function tryUnlock(){
+  const inp=document.getElementById('gatePw');
+  if(inp.value===PASSWORD){document.getElementById('gate').classList.add('hidden');setTimeout(()=>init(),300);}
+  else{inp.classList.add('error');inp.value='';setTimeout(()=>inp.classList.remove('error'),500);}
+}
+document.getElementById('gatePw').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
+
+// ═══════════════════════════════════
+// DATA
+// ═══════════════════════════════════
+const CC={hyperscaler:'var(--accent-amber)',gpu:'var(--accent-green)',foundry:'var(--accent-blue)',memory:'var(--accent-purple)',equipment:'var(--accent-red)',networking:'var(--accent-cyan)',power:'var(--accent-orange)',cooling:'var(--accent-pink)',oem:'var(--accent-teal)',sovereign:'var(--accent-gold)'};
+const DH={hyperscaler:'#f59e0b',gpu:'#10b981',foundry:'#3b82f6',memory:'#a855f7',equipment:'#ef4444',networking:'#06b6d4',power:'#f97316',cooling:'#ec4899',oem:'#14b8a6',sovereign:'#d4a017'};
+const catNames={hyperscaler:{en:'Hyperscalers',tc:'超大規模雲端'},gpu:{en:'GPU / Accelerators',tc:'GPU / 加速器'},foundry:{en:'Foundry',tc:'晶圓代工'},memory:{en:'Memory',tc:'記憶體'},equipment:{en:'Equipment',tc:'半導體設備'},networking:{en:'Networking',tc:'網路互連'},power:{en:'Power',tc:'電力'},cooling:{en:'Cooling',tc:'散熱'},oem:{en:'OEM / ODM',tc:'伺服器代工'},sovereign:{en:'Sovereign AI',tc:'主權AI'}};
+
+const D={
+  MSFT:{t:'MSFT',n:'Microsoft',tc:'微軟',cat:'hyperscaler',mc:'$2.8T',ai:'$120B+ CAPEX',aitc:'$120B+ 資本開支',cx:[{y:'FY2024',a:'$55.7B',d:'+74%',g:74},{y:'FY2025',a:'~$80B',d:'Azure AI',g:44},{y:'FY2026E',a:'$120B+',d:'$80B backlog',g:50}],cust:[],sup:['NVDA','AMD','DELL','HPE','VRT','GEV'],th:'$120B+ in 2026. $80B Azure backlog (power).',thtc:'2026年$120B+。$80B Azure積壓（電力瓶頸）。'},
+  GOOGL:{t:'GOOGL',n:'Alphabet',tc:'谷歌',cat:'hyperscaler',mc:'$2.1T',ai:'$175-185B',aitc:'$175-185B',cx:[{y:'2024',a:'$52.5B',d:'TPU v5',g:0},{y:'2025',a:'$91.4B',d:'3rd revision',g:74},{y:'2026E',a:'$175-185B',d:'TPU + DC',g:95}],cust:[],sup:['NVDA','AVGO','QUANTA','VRT','GEV'],th:'$175-185B 2026. TPU via Broadcom.',thtc:'2026年$175-185B。Broadcom定制TPU。'},
+  AMZN:{t:'AMZN',n:'Amazon',tc:'亞馬遜',cat:'hyperscaler',mc:'$2.0T',ai:'$200B',aitc:'$200B',cx:[{y:'2024',a:'$83.2B',d:'AWS',g:0},{y:'2025',a:'~$100B',d:'AI focus',g:20},{y:'2026E',a:'$200B',d:'Doubling',g:100}],cust:[],sup:['NVDA','AMD','QUANTA','WIWYNN','MRVL','VRT','GEV'],th:'$200B 2026. Trainium + GPU.',thtc:'$200B 2026年。Trainium+GPU。'},
+  META:{t:'META',n:'Meta',tc:'Meta',cat:'hyperscaler',mc:'$1.5T',ai:'$115-135B',aitc:'$115-135B',cx:[{y:'2024',a:'$37.3B',d:'LLaMA',g:0},{y:'2025',a:'$72.2B',d:'Scale-up',g:94},{y:'2026E',a:'$115-135B',d:'+88%',g:88}],cust:[],sup:['NVDA','AVGO','QUANTA','FOXCONN','VRT'],th:'88% increase to $115-135B.',thtc:'增長88%至$115B-$135B。'},
+  ORCL:{t:'ORCL',n:'Oracle',tc:'甲骨文',cat:'hyperscaler',mc:'$420B',ai:'$50B',aitc:'$50B',cx:[{y:'FY2024',a:'$12.4B',d:'OCI',g:0},{y:'FY2025',a:'~$35B',d:'Stargate',g:182},{y:'FY2026E',a:'$50B',d:'Cloud AI',g:43}],cust:[],sup:['NVDA','TSM','VRT','GEV'],th:'$50B 2026. OCI gaining share.',thtc:'2026年$50B。OCI獲取份額。'},
+  SOV_AI:{t:'Sovereign AI',n:'Sovereign AI & Enterprise',tc:'主權AI與企業需求',cat:'sovereign',mc:'~$150B+ spend',ai:'Middle East / EU / F500',aitc:'中東/歐洲/財星500',cx:[{y:'2024',a:'~$30B',d:'Emerging',g:0},{y:'2025',a:'~$60B',d:'UAE, Saudi, EU',g:100},{y:'2026E',a:'$100B+',d:'Sovereign clouds',g:67}],cust:[],sup:['NVDA','DELL','HPE'],th:'UAE, Saudi, EU sovereign clouds + F500 private AI. ~$100B+ in 2026 beyond hyperscalers.',thtc:'阿聯酋、沙特、歐盟主權雲+財星500私有AI。2026年超大規模之外~$100B+。'},
+
+  // OEM / ODM
+  DELL:{t:'DELL',n:'Dell Technologies',tc:'戴爾科技',cat:'oem',mc:'$75B',ai:'~40% AI servers',aitc:'約40% AI伺服器',cx:[{y:'FY2024',a:'$88B',d:'Rev',g:0},{y:'FY2025',a:'$95B',d:'Rev, ISG growth',g:8},{y:'FY2026E',a:'$105B+',d:'PowerEdge AI',g:11}],cust:['MSFT','AMZN','SOV_AI'],sup:['NVDA','AMD','SK_HYNIX','VRT'],th:'Enterprise AI server leader (PowerEdge). Overtook SMCI in Blackwell shipments. Key sovereign AI channel.',thtc:'企業AI伺服器領導者(PowerEdge)。Blackwell出貨超越SMCI。主要主權AI通路。'},
+  HPE:{t:'HPE',n:'HP Enterprise',tc:'慧與科技',cat:'oem',mc:'$25B',ai:'~30% AI servers',aitc:'約30% AI伺服器',cx:[{y:'FY2024',a:'$30B',d:'Rev',g:0},{y:'FY2025',a:'$33B',d:'Rev',g:10},{y:'FY2026E',a:'$36B+',d:'Cray AI + GreenLake',g:9}],cust:['MSFT','SOV_AI'],sup:['NVDA','AMD','SK_HYNIX'],th:'Cray AI supercomputers + GreenLake hybrid cloud. Strong in sovereign AI deployments.',thtc:'Cray AI超級電腦+GreenLake混合雲。在主權AI部署中表現強勁。'},
+  QUANTA:{t:'2382.TW',n:'Quanta Computer',tc:'廣達電腦',cat:'oem',mc:'$45B',ai:'~50% AI/cloud ODM',aitc:'約50% AI/雲端代工',cx:[{y:'2024',a:'$40B',d:'Rev',g:0},{y:'2025',a:'$48B',d:'NVL72 ramp',g:20},{y:'2026E',a:'$58B+',d:'NVL rack scale',g:21}],cust:['GOOGL','AMZN','META','MSFT'],sup:['NVDA','COHR','VRT'],th:'World\'s largest cloud server ODM. Primary assembler of NVIDIA NVL72/NVL36 racks for hyperscalers. L10-L12 integration.',thtc:'全球最大雲端伺服器代工。為超大規模客戶組裝NVIDIA NVL72/NVL36機櫃的主要供應商。L10-L12整合。'},
+  FOXCONN:{t:'2317.TW',n:'Foxconn / Hon Hai',tc:'鴻海精密',cat:'oem',mc:'$60B',ai:'~35% AI server ODM',aitc:'約35% AI伺服器代工',cx:[{y:'2024',a:'$200B',d:'Rev total',g:0},{y:'2025',a:'$215B',d:'AI accelerating',g:8},{y:'2026E',a:'$235B+',d:'GB200 volume',g:9}],cust:['META','AMZN','NVDA'],sup:['NVDA','COHR'],th:'Largest EMS globally. Major GB200 NVL assembler for Meta. AI server revenue doubling annually.',thtc:'全球最大電子代工。為Meta組裝GB200 NVL的主要廠商。AI伺服器營收年增翻倍。'},
+  WIWYNN:{t:'6669.TW',n:'Wiwynn',tc:'緯穎',cat:'oem',mc:'$22B',ai:'~80% cloud/AI ODM',aitc:'約80%雲端/AI代工',cx:[{y:'2024',a:'$10B',d:'Rev',g:0},{y:'2025',a:'$16B',d:'AI rack surge',g:60},{y:'2026E',a:'$22B+',d:'NVL72 + liquid cool',g:38}],cust:['AMZN','META','MSFT'],sup:['NVDA','VRT'],th:'Pure-play cloud AI server ODM. 80%+ revenue from top-3 hyperscalers. Deep liquid cooling expertise.',thtc:'純雲端AI伺服器代工。80%+營收來自前三大超大規模客戶。深厚液冷專業能力。'},
+
+  NVDA:{t:'NVDA',n:'NVIDIA',tc:'輝達',cat:'gpu',mc:'$2.7T+',ai:'87% DC',aitc:'87%DC',cx:[{y:'FY2025',a:'$3.2B',d:'Fabless',g:0},{y:'FY2026',a:'$4.5B',d:'Blackwell',g:41},{y:'FY2027E',a:'$5B+',d:'Rubin',g:11}],cust:['DELL','HPE','QUANTA','FOXCONN','WIWYNN'],sup:['TSM','SK_HYNIX','COHR','ALAB','MRVL'],th:'$660B+ hyperscaler spend beneficiary. GPUs flow through OEM/ODMs to end customers.',thtc:'$660B+超大規模支出受益者。GPU通過代工廠流向終端客戶。'},
+  AMD:{t:'AMD',n:'AMD',tc:'超微',cat:'gpu',mc:'$160B',ai:'~35%',aitc:'約35%',cx:[{y:'2024',a:'$1.3B',d:'Fabless',g:0},{y:'2025',a:'$1.8B',d:'MI300X',g:38},{y:'2026E',a:'$2.2B',d:'MI400',g:22}],cust:['DELL','HPE','MSFT','AMZN'],sup:['TSM','SK_HYNIX','MU'],th:'MI300X gaining inference share via Dell/HPE servers.',thtc:'MI300X通過Dell/HPE伺服器獲得推論份額。'},
+  AVGO:{t:'AVGO',n:'Broadcom',tc:'博通',cat:'gpu',mc:'$1.8T',ai:'~45%',aitc:'約45%',cx:[{y:'FY2024',a:'$2.1B',d:'Fabless',g:0},{y:'FY2025',a:'$2.8B',d:'5 customers',g:33},{y:'FY2026E',a:'$3.5B',d:'ASIC 2x',g:25}],cust:['GOOGL','META','MSFT','AMZN'],sup:['TSM'],th:'Custom ASIC ~70% share. Google TPU, Meta MTIA.',thtc:'客製ASIC ~70%份額。'},
+  TSM:{t:'TSM',n:'TSMC',tc:'台積電',cat:'foundry',mc:'$850B',ai:'~50% HPC',aitc:'約50%',cx:[{y:'2024',a:'$29.8B',d:'',g:0},{y:'2025',a:'$41B',d:'+37%',g:37},{y:'2026E',a:'$52-56B',d:'N2 ramp',g:32}],cust:['NVDA','AMD','AVGO','MRVL','ALAB'],sup:['ASML','AMAT','LRCX','KLAC','TEL'],th:'$52-56B CAPEX → equipment. 70-80% advanced.',thtc:'$52-56B資本開支→設備。70-80%先進製程。'},
+  SK_HYNIX:{t:'SK Hynix',n:'SK Hynix',tc:'SK海力士',cat:'memory',mc:'$95B',ai:'>60% HBM',aitc:'>60% HBM',cx:[{y:'2024',a:'$12.8B',d:'HBM3E',g:0},{y:'2025',a:'~$22B',d:'+75%',g:75},{y:'2026E',a:'$31B+',d:'HBM4',g:41}],cust:['NVDA','AMD','DELL'],sup:['ASML','AMAT','LRCX','KLAC','TEL'],th:'HBM leader >60%. Every GPU needs HBM.',thtc:'HBM領導者>60%。每顆GPU需要HBM。'},
+  SAMSUNG_MEM:{t:'Samsung',n:'Samsung',tc:'三星電子',cat:'memory',mc:'$310B',ai:'~30%',aitc:'約30%',cx:[{y:'2024',a:'$33.5B',d:'',g:0},{y:'2025',a:'$33B',d:'Flat',g:-1},{y:'2026E',a:'$40B',d:'+20%',g:21}],cust:['NVDA','AMD'],sup:['ASML','AMAT','LRCX','KLAC','TEL'],th:'₩110T total 2026. HBM catch-up.',thtc:'2026年₩110T。HBM追趕。'},
+  MU:{t:'MU',n:'Micron',tc:'美光',cat:'memory',mc:'$95B',ai:'~25%',aitc:'約25%',cx:[{y:'FY2024',a:'$8.4B',d:'',g:0},{y:'FY2025',a:'$14B',d:'+47%',g:47},{y:'FY2026E',a:'$20B+',d:'+40%',g:43}],cust:['NVDA','AMD'],sup:['ASML','AMAT','LRCX','KLAC','TEL'],th:'HBM3E for NVIDIA.',thtc:'NVIDIA HBM3E認證。'},
+  ASML:{t:'ASML',n:'ASML',tc:'阿斯麥',cat:'equipment',mc:'$260B+',ai:'100% EUV',aitc:'100% EUV壟斷',cx:[{y:'2024',a:'€28.3B',d:'Rev',g:0},{y:'2025',a:'€32.7B',d:'+16%',g:16},{y:'2026E',a:'€38-44B',d:'Backlog',g:22}],cust:['TSM','SAMSUNG_MEM','SK_HYNIX','MU'],sup:[],th:'EUV monopoly. Ultimate selling shovels.',thtc:'EUV壟斷。終極賣鏟子。'},
+  AMAT:{t:'AMAT',n:'Applied Materials',tc:'應用材料',cat:'equipment',mc:'$130B',ai:'~40%',aitc:'約40%',cx:[{y:'2024',a:'$27.2B',d:'Rev',g:0},{y:'2025',a:'$27.5B',d:'+1%',g:1},{y:'2026E',a:'$29B+',d:'Packaging',g:5}],cust:['TSM','SAMSUNG_MEM','SK_HYNIX','MU'],sup:[],th:'Broadest equipment portfolio.',thtc:'最廣泛設備產品線。'},
+  LRCX:{t:'LRCX',n:'Lam Research',tc:'科林研發',cat:'equipment',mc:'$96B',ai:'~50%',aitc:'約50%',cx:[{y:'2024',a:'$17.4B',d:'Rev',g:0},{y:'2025',a:'$20B',d:'+22%',g:22},{y:'2026E',a:'$22.8B+',d:'HBM etch',g:14}],cust:['TSM','SAMSUNG_MEM','SK_HYNIX','MU'],sup:[],th:'Critical HBM etch.',thtc:'HBM關鍵蝕刻。'},
+  KLAC:{t:'KLAC',n:'KLA Corp',tc:'科磊',cat:'equipment',mc:'$90B',ai:'~35%',aitc:'約35%',cx:[{y:'2024',a:'$11.3B',d:'Rev',g:0},{y:'2025',a:'$12B',d:'Record',g:6},{y:'2026E',a:'$13B+',d:'Yield',g:8}],cust:['TSM','SAMSUNG_MEM','SK_HYNIX','MU'],sup:[],th:'Process control monopoly.',thtc:'製程控制壟斷。'},
+  TEL:{t:'TEL',n:'Tokyo Electron',tc:'東京威力科創',cat:'equipment',mc:'$65B',ai:'~40%',aitc:'約40%',cx:[{y:'2024',a:'¥2.09T',d:'Rev',g:0},{y:'2025',a:'¥2.40T',d:'+15%',g:15},{y:'2026E',a:'¥2.7T+',d:'Complement',g:13}],cust:['TSM','SAMSUNG_MEM','SK_HYNIX','MU'],sup:[],th:'ASML complement.',thtc:'ASML互補設備。'},
+  COHR:{t:'COHR',n:'Coherent',tc:'相干',cat:'networking',mc:'$14B',ai:'~55%',aitc:'約55%',cx:[{y:'2024',a:'$5.1B',d:'Rev',g:0},{y:'2025',a:'$5.8B',d:'800G',g:14},{y:'2026E',a:'$7B+',d:'1.6T',g:21}],cust:['NVDA','QUANTA','FOXCONN'],sup:['TSM'],th:'Optical transceivers 800G→1.6T.',thtc:'光學收發器800G→1.6T。'},
+  MRVL:{t:'MRVL',n:'Marvell',tc:'邁威爾',cat:'networking',mc:'$80B',ai:'~60%',aitc:'約60%',cx:[{y:'FY2025',a:'$5.77B',d:'Rev',g:0},{y:'FY2026',a:'$8.2B',d:'+42%',g:42},{y:'FY2027E',a:'$10B+',d:'NVDA $2B',g:22}],cust:['AMZN','NVDA'],sup:['TSM'],th:'Custom silicon + optical DSP. NVDA $2B.',thtc:'定制矽+光學DSP。NVDA $2B。'},
+  ALAB:{t:'ALAB',n:'Astera Labs',tc:'Astera Labs',cat:'networking',mc:'$12B',ai:'~90%',aitc:'約90%',cx:[{y:'2024',a:'$396M',d:'IPO',g:0},{y:'2025',a:'$700M+',d:'Scorpio',g:77},{y:'2026E',a:'$1B+',d:'AMZN warrant',g:43}],cust:['NVDA','AMZN'],sup:['TSM'],th:'PCIe retimers. AMZN $6.5B warrant.',thtc:'PCIe重定時器。AMZN $6.5B。'},
+  CRDO:{t:'CRDO',n:'Credo',tc:'信驊',cat:'networking',mc:'$9B',ai:'~85%',aitc:'約85%',cx:[{y:'2024',a:'$220M',d:'Rev',g:0},{y:'2025',a:'$500M+',d:'AEC',g:127},{y:'2026E',a:'$800M+',d:'AEC surge',g:60}],cust:['MSFT','AMZN'],sup:['TSM'],th:'AEC cables intra-rack.',thtc:'機架內主動電纜。'},
+  GEV:{t:'GEV',n:'GE Vernova',tc:'GE Vernova',cat:'power',mc:'$85B',ai:'~35%',aitc:'約35%',cx:[{y:'2024',a:'$36B',d:'Rev',g:0},{y:'2025',a:'$38B',d:'>$135B backlog',g:6},{y:'2026E',a:'$41-42B',d:'→$200B',g:9}],cust:['MSFT','GOOGL','AMZN','META'],sup:[],th:'Gas turbines. Power bottleneck solver.',thtc:'燃氣輪機。電力瓶頸解方。'},
+  VST:{t:'VST',n:'Vistra',tc:'Vistra',cat:'power',mc:'$42B',ai:'~25%',aitc:'約25%',cx:[{y:'2024',a:'$18.4B',d:'Rev',g:0},{y:'2025',a:'$20B',d:'Nuclear',g:9},{y:'2026E',a:'$22B+',d:'PPA repricing',g:10}],cust:['MSFT','AMZN'],sup:[],th:'Nuclear baseload.',thtc:'核電基載。'},
+  ETN:{t:'ETN',n:'Eaton',tc:'伊頓',cat:'power',mc:'$115B',ai:'~30%',aitc:'約30%',cx:[{y:'2024',a:'$24.3B',d:'Rev',g:0},{y:'2025',a:'$26.5B',d:'+11%',g:11},{y:'2026E',a:'$29B+',d:'Shortage',g:9}],cust:['MSFT','GOOGL','AMZN'],sup:[],th:'Transformers grid-to-rack.',thtc:'變壓器電網到機架。'},
+  VRT:{t:'VRT',n:'Vertiv',tc:'維諦',cat:'cooling',mc:'$35B',ai:'~55%',aitc:'約55%',cx:[{y:'2024',a:'$7.6B',d:'Rev',g:0},{y:'2025',a:'$9.5B+',d:'+28%',g:25},{y:'2026E',a:'$11B+',d:'Liquid cooling',g:16}],cust:['DELL','QUANTA','WIWYNN','MSFT'],sup:[],th:'NVDA liquid cooling ref. TDP>1000W.',thtc:'NVDA液冷參考設計。TDP>1000W。'},
+};
+
+// LAYOUT
+const cX=1700,cY=750;
+const P={
+  _C:{x:cX,y:cY},
+  // Top row: Hyperscalers + Sovereign AI
+  SOV_AI:{x:350,y:100},
+  MSFT:{x:cX-520,y:120},GOOGL:{x:cX-200,y:70},AMZN:{x:cX+160,y:70},META:{x:cX+480,y:120},ORCL:{x:cX+760,y:220},
+  // OEM/ODM row
+  DELL:{x:cX-500,y:360},HPE:{x:cX-280,y:340},QUANTA:{x:cX,y:320},FOXCONN:{x:cX+280,y:340},WIWYNN:{x:cX+500,y:360},
+  // GPU row
+  NVDA:{x:cX-300,y:560},AMD:{x:cX+60,y:540},AVGO:{x:cX+380,y:560},
+  // Foundry
+  TSM:{x:cX-60,y:920},
+  // Memory
+  SK_HYNIX:{x:cX+360,y:900},SAMSUNG_MEM:{x:cX+580,y:980},MU:{x:cX+780,y:900},
+  // Equipment
+  ASML:{x:cX-400,y:1280},AMAT:{x:cX-140,y:1360},LRCX:{x:cX+140,y:1360},KLAC:{x:cX+400,y:1280},TEL:{x:cX+640,y:1360},
+  // Networking
+  COHR:{x:280,y:540},MRVL:{x:250,y:730},ALAB:{x:280,y:920},CRDO:{x:310,y:1110},
+  // Power + Cooling
+  GEV:{x:2900,y:420},VST:{x:2920,y:610},ETN:{x:2900,y:800},VRT:{x:2950,y:1040},
+};
+
+const conns=[
+  // Hyperscalers → OEM/ODM
+  {f:'MSFT',t:'DELL',c:'var(--accent-amber)'},{f:'MSFT',t:'HPE',c:'var(--accent-amber)'},
+  {f:'GOOGL',t:'QUANTA',c:'var(--accent-amber)'},{f:'AMZN',t:'QUANTA',c:'var(--accent-amber)'},{f:'AMZN',t:'WIWYNN',c:'var(--accent-amber)'},
+  {f:'META',t:'QUANTA',c:'var(--accent-amber)'},{f:'META',t:'FOXCONN',c:'var(--accent-amber)'},
+  {f:'MSFT',t:'QUANTA',c:'var(--accent-amber)'},
+  // Sovereign → OEM
+  {f:'SOV_AI',t:'DELL',c:'var(--accent-gold)'},{f:'SOV_AI',t:'HPE',c:'var(--accent-gold)'},{f:'SOV_AI',t:'NVDA',c:'var(--accent-gold)'},
+  // Hyperscalers → direct GPU (some)
+  {f:'MSFT',t:'NVDA',c:'var(--accent-amber)'},{f:'ORCL',t:'NVDA',c:'var(--accent-amber)'},
+  {f:'GOOGL',t:'AVGO',c:'var(--accent-amber)'},{f:'META',t:'AVGO',c:'var(--accent-amber)'},
+  // Hyperscalers → Networking / Power / Cooling
+  {f:'MSFT',t:'CRDO',c:'var(--accent-amber)'},{f:'GOOGL',t:'GEV',c:'var(--accent-amber)'},{f:'AMZN',t:'GEV',c:'var(--accent-amber)'},{f:'MSFT',t:'GEV',c:'var(--accent-amber)'},{f:'MSFT',t:'VST',c:'var(--accent-amber)'},{f:'MSFT',t:'ETN',c:'var(--accent-amber)'},{f:'GOOGL',t:'ETN',c:'var(--accent-amber)'},
+  {f:'MSFT',t:'VRT',c:'var(--accent-amber)'},{f:'AMZN',t:'VRT',c:'var(--accent-amber)'},
+  {f:'AMZN',t:'MRVL',c:'var(--accent-amber)'},{f:'AMZN',t:'ALAB',c:'var(--accent-amber)'},
+  // OEM/ODM → GPU
+  {f:'DELL',t:'NVDA',c:'var(--accent-teal)'},{f:'HPE',t:'NVDA',c:'var(--accent-teal)'},{f:'QUANTA',t:'NVDA',c:'var(--accent-teal)'},{f:'FOXCONN',t:'NVDA',c:'var(--accent-teal)'},{f:'WIWYNN',t:'NVDA',c:'var(--accent-teal)'},
+  {f:'DELL',t:'AMD',c:'var(--accent-teal)'},{f:'HPE',t:'AMD',c:'var(--accent-teal)'},
+  // OEM/ODM → Cooling/Networking
+  {f:'QUANTA',t:'COHR',c:'var(--accent-teal)'},{f:'QUANTA',t:'VRT',c:'var(--accent-teal)'},{f:'WIWYNN',t:'VRT',c:'var(--accent-teal)'},
+  // GPU → Foundry
+  {f:'NVDA',t:'TSM',c:'var(--accent-green)'},{f:'AMD',t:'TSM',c:'var(--accent-green)'},{f:'AVGO',t:'TSM',c:'var(--accent-green)'},
+  // GPU → Memory
+  {f:'NVDA',t:'SK_HYNIX',c:'var(--accent-green)'},{f:'NVDA',t:'MU',c:'var(--accent-green)'},{f:'NVDA',t:'SAMSUNG_MEM',c:'var(--accent-green)'},{f:'AMD',t:'SK_HYNIX',c:'var(--accent-green)'},
+  // GPU → Networking
+  {f:'NVDA',t:'COHR',c:'var(--accent-green)'},{f:'NVDA',t:'MRVL',c:'var(--accent-green)'},{f:'NVDA',t:'ALAB',c:'var(--accent-green)'},
+  // Foundry → Equipment
+  {f:'TSM',t:'ASML',c:'var(--accent-blue)'},{f:'TSM',t:'AMAT',c:'var(--accent-blue)'},{f:'TSM',t:'LRCX',c:'var(--accent-blue)'},{f:'TSM',t:'KLAC',c:'var(--accent-blue)'},{f:'TSM',t:'TEL',c:'var(--accent-blue)'},
+  // Memory → Equipment
+  {f:'SK_HYNIX',t:'ASML',c:'var(--accent-purple)'},{f:'SK_HYNIX',t:'AMAT',c:'var(--accent-purple)'},{f:'SK_HYNIX',t:'LRCX',c:'var(--accent-purple)'},{f:'SK_HYNIX',t:'KLAC',c:'var(--accent-purple)'},
+  {f:'SAMSUNG_MEM',t:'ASML',c:'var(--accent-purple)'},{f:'SAMSUNG_MEM',t:'LRCX',c:'var(--accent-purple)'},
+  {f:'MU',t:'AMAT',c:'var(--accent-purple)'},{f:'MU',t:'LRCX',c:'var(--accent-purple)'},{f:'MU',t:'KLAC',c:'var(--accent-purple)'},
+  // Networking → Foundry
+  {f:'MRVL',t:'TSM',c:'var(--accent-cyan)'},{f:'ALAB',t:'TSM',c:'var(--accent-cyan)'},{f:'CRDO',t:'TSM',c:'var(--accent-cyan)'}
+];
+
+const CL=[
+  {t:'HYPERSCALERS ($660B+)',tc:'雲端巨頭 ($660B+)',x:cX,y:12,c:'var(--accent-amber)'},
+  {t:'SOVEREIGN AI & ENTERPRISE',tc:'主權AI與企業',x:350,y:40,c:'var(--accent-gold)'},
+  {t:'OEM / ODM SERVER INTEGRATORS',tc:'伺服器 OEM / ODM 整合商',x:cX,y:260,c:'var(--accent-teal)'},
+  {t:'GPU / ACCELERATORS',tc:'GPU / 加速器',x:cX-300,y:490,c:'var(--accent-green)'},
+  {t:'FOUNDRY',tc:'晶圓代工',x:cX+120,y:880,c:'var(--accent-blue)'},
+  {t:'MEMORY',tc:'記憶體',x:cX+580,y:830,c:'var(--accent-purple)'},
+  {t:'EQUIPMENT — SELLING SHOVELS',tc:'半導體設備 — 賣鏟子',x:cX,y:1210,c:'var(--accent-red)'},
+  {t:'NETWORKING',tc:'網路互連',x:260,y:440,c:'var(--accent-cyan)'},
+  {t:'POWER',tc:'電力',x:2900,y:340,c:'var(--accent-orange)'},
+  {t:'COOLING',tc:'散熱',x:2930,y:970,c:'var(--accent-pink)'},
+];
+
+let scale=0.45,lang='en',panX=0,panY=0,activeCatFilter=null;
+const cc=document.getElementById('cc'),cv=document.getElementById('canvas');
+
+function toggleLang(){lang=lang==='en'?'tc':'en';document.body.classList.toggle('lang-tc',lang==='tc');renderLabels();buildLegend();}
+
+// LEGEND (interactive filtering)
+function buildLegend(){
+  const bar=document.getElementById('legendBar');bar.innerHTML='';
+  const cats=Object.keys(catNames);
+  cats.forEach(cat=>{
+    const item=document.createElement('div');item.className='legend-item'+(activeCatFilter===cat?' active':'');
+    item.innerHTML=`<div class="legend-dot" style="background:${DH[cat]}"></div>${lang==='tc'?catNames[cat].tc:catNames[cat].en}`;
+    item.onclick=()=>{activeCatFilter=activeCatFilter===cat?null:cat;buildLegend();applyFilter();};
+    bar.appendChild(item);
+  });
+  // flow indicator
+  const fi=document.createElement('div');fi.className='legend-item';fi.style.marginLeft='auto';fi.style.gap='6px';fi.style.cursor='default';
+  fi.innerHTML=`<svg width="30" height="7"><line x1="0" y1="3.5" x2="22" y2="3.5" stroke="var(--text-muted)" stroke-width="1.2" stroke-dasharray="4 2"><animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.7s" repeatCount="indefinite"/></line><polygon points="22,0 30,3.5 22,7" fill="var(--text-muted)" opacity="0.5"/></svg><span style="font-size:8px;">$ flow</span>`;
+  bar.appendChild(fi);
+}
+
+function applyFilter(){
+  document.querySelectorAll('.node-company').forEach(n=>{
+    const id=n.dataset.id,co=D[id];if(!co)return;
+    if(!activeCatFilter){n.classList.remove('filtered-out');return;}
+    const connected=co.cat===activeCatFilter||conns.some(c=>{
+      const other=c.f===id?c.t:c.t===id?c.f:null;
+      return other&&D[other]&&D[other].cat===activeCatFilter;
+    })||co.cust.some(c=>D[c]&&D[c].cat===activeCatFilter)||co.sup.some(s=>D[s]&&D[s].cat===activeCatFilter);
+    n.classList.toggle('filtered-out',!connected);
+  });
+  document.querySelectorAll('.conn-line').forEach(l=>{
+    if(!activeCatFilter){l.classList.remove('dim');return;}
+    const fco=D[l.dataset.from],tco=D[l.dataset.to];
+    l.classList.toggle('dim',!(fco&&fco.cat===activeCatFilter||tco&&tco.cat===activeCatFilter));
+  });
+}
+
+// ORTHOGONAL ROUTING
+function ortho(x1,y1,x2,y2){const r=12,dx=x2-x1,dy=y2-y1,adx=Math.abs(dx),ady=Math.abs(dy);if(ady>adx*0.3){const my=y1+dy*0.5,sx=Math.sign(dx),sy=Math.sign(dy);if(adx<r*3)return`M${x1},${y1}L${x1},${my}L${x2},${my}L${x2},${y2}`;return`M${x1},${y1}L${x1},${my-r*sy}Q${x1},${my} ${x1+r*sx},${my}L${x2-r*sx},${my}Q${x2},${my} ${x2},${my+r*sy}L${x2},${y2}`;}const mx=x1+dx*0.5,sx=Math.sign(dx),sy=Math.sign(dy);if(ady<r*3)return`M${x1},${y1}L${mx},${y1}L${mx},${y2}L${x2},${y2}`;return`M${x1},${y1}L${mx-r*sx},${y1}Q${mx},${y1} ${mx},${y1+r*sy}L${mx},${y2-r*sy}Q${mx},${y2} ${mx+r*sx},${y2}L${x2},${y2}`;}
+
+function renderConns(){const svg=document.getElementById('svg');const defs=svg.querySelector('defs');svg.innerHTML='';svg.appendChild(defs);conns.forEach(cn=>{const fp=P[cn.f],tp=P[cn.t];if(!fp||!tp)return;const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('d',ortho(fp.x,fp.y,tp.x,tp.y));p.setAttribute('stroke',cn.c);p.setAttribute('marker-end','url(#ah)');p.classList.add('conn-line');p.dataset.from=cn.f;p.dataset.to=cn.t;svg.appendChild(p);});}
+
+function renderNodes(){
+  const cd=document.createElement('div');cd.className='node node-center';cd.style.left=(cX-100)+'px';cd.style.top=(cY-100)+'px';
+  cd.innerHTML=`<div class="node-ticker">AI CAPEX 2026</div><div class="node-name"><span class="en-text">$760B+ Total AI Spend<br>Hyperscalers + Sovereign + Enterprise</span><span class="tc-text">$760B+ AI 總支出<br>雲端巨頭 + 主權 + 企業</span></div>`;
+  cv.appendChild(cd);
+  for(const[id,co] of Object.entries(D)){const pos=P[id];if(!pos)continue;const d=document.createElement('div');d.className=`node node-company cat-${co.cat}`;const hw=co.cat==='hyperscaler'?73:69,hh=co.cat==='hyperscaler'?40:38;d.style.left=(pos.x-hw)+'px';d.style.top=(pos.y-hh)+'px';d.dataset.id=id;d.tabIndex=0;d.onclick=()=>openModal(id);d.onkeydown=e=>{if(e.key==='Enter')openModal(id);};d.onmouseenter=e=>{hlConns(id);showTT(e,id);};d.onmouseleave=()=>{resetConns();hideTT();};d.onmousemove=e=>moveTT(e);const cl=co.cx[2]?co.cx[2].a:'';d.innerHTML=`<div class="node-ticker">${co.t}</div><div class="node-name"><span class="en-text">${co.n}</span><span class="tc-text">${co.tc}</span></div><div class="node-mcap">${co.mc}</div>${cl?`<div class="capex-magnitude">${cl}</div>`:''}`;cv.appendChild(d);}
+}
+
+function renderLabels(){document.querySelectorAll('.node-cluster-label').forEach(e=>e.remove());CL.forEach(cl=>{const d=document.createElement('div');d.className='node-cluster-label';d.style.left=cl.x+'px';d.style.top=cl.y+'px';d.style.color=cl.c;d.style.borderBottom=`2px solid ${cl.c}`;d.textContent=lang==='tc'?cl.tc:cl.t;cv.appendChild(d);});}
+
+function hlConns(id){document.querySelectorAll('.conn-line').forEach(l=>{const m=l.dataset.from===id||l.dataset.to===id;l.classList.toggle('highlight',m);l.classList.toggle('dim',!m);l.setAttribute('marker-end',m?'url(#ahH)':'url(#ah)');});document.querySelectorAll('.node-company').forEach(n=>{n.style.opacity=(n.dataset.id===id||conns.some(c=>(c.f===id&&c.t===n.dataset.id)||(c.t===id&&c.f===n.dataset.id)))?'1':'0.15';});}
+function resetConns(){document.querySelectorAll('.conn-line').forEach(l=>{l.classList.remove('highlight','dim');l.setAttribute('marker-end','url(#ah)');});document.querySelectorAll('.node-company').forEach(n=>n.style.opacity='');applyFilter();}
+
+// TOOLTIP
+let ttT=null;const tt=document.getElementById('tooltip');
+function showTT(e,id){clearTimeout(ttT);ttT=setTimeout(()=>{const co=D[id];if(!co)return;tt.querySelector('.tt-ticker').textContent=co.t;tt.querySelector('.tt-ticker').style.color=DH[co.cat];tt.querySelector('.tt-capex').textContent='2026E: '+(co.cx[2]?co.cx[2].a:'N/A');tt.querySelector('.tt-thesis').textContent=lang==='tc'?co.thtc:co.th;tt.classList.add('visible');moveTT(e);},400);}
+function moveTT(e){tt.style.left=Math.min(e.clientX+14,window.innerWidth-280)+'px';tt.style.top=(e.clientY+14)+'px';}
+function hideTT(){clearTimeout(ttT);tt.classList.remove('visible');}
+
+// SEARCH
+let sT=null;function debouncedSearch(){clearTimeout(sT);sT=setTimeout(()=>{const q=document.getElementById('searchInput').value.toLowerCase();document.querySelectorAll('.node-company').forEach(n=>{const t=n.innerText.toLowerCase();if(!q){n.style.opacity='';n.style.transform='';n.style.boxShadow='';}else if(t.includes(q)){n.style.opacity='1';n.style.transform='scale(1.12)';n.style.boxShadow='0 0 25px rgba(255,255,255,0.25)';}else{n.style.opacity='0.08';n.style.transform='scale(0.92)';n.style.boxShadow='none';}});},250);}
+
+// rAF RENDER ENGINE
+const CW=3600,CH=2200;let rafId=null,needsR=false;
+function schedR(){if(!needsR){needsR=true;rafId=requestAnimationFrame(()=>{renderFrame();needsR=false;});}}
+function renderFrame(){const r=cc.getBoundingClientRect();panX=Math.max(-(CW*scale-r.width*0.6),Math.min(r.width*0.4,panX));panY=Math.max(-(CH*scale-r.height*0.6),Math.min(r.height*0.3,panY));cv.style.transform=`translate(${panX}px,${panY}px) scale(${scale})`;document.getElementById('zoomPct').textContent=Math.round(scale*100)+'%';drawMM();debouncedVP();}
+function applyTx(){schedR();}
+function zoomAtPoint(d,cx,cy){const os=scale;scale=Math.max(0.15,Math.min(1.5,scale+d));const r=scale/os;panX=cx-(cx-panX)*r;panY=cy-(cy-panY)*r;applyTx();}
+function zoomAt(d){const r=cc.getBoundingClientRect();zoomAtPoint(d,r.width/2,r.height/2);}
+function resetView(){scale=0.45;const r=cc.getBoundingClientRect();panX=(r.width-CW*scale)/2;panY=10;applyTx();}
+
+// FIT TO VIEW
+function fitToView(){
+  const xs=Object.values(P).map(p=>p.x),ys=Object.values(P).map(p=>p.y);
+  const minX=Math.min(...xs)-100,maxX=Math.max(...xs)+100,minY=Math.min(...ys)-60,maxY=Math.max(...ys)+60;
+  const r=cc.getBoundingClientRect();
+  const sw=r.width/(maxX-minX),sh=r.height/(maxY-minY);
+  scale=Math.min(sw,sh,1.0)*0.92;
+  panX=-minX*scale+(r.width-((maxX-minX)*scale))/2;
+  panY=-minY*scale+(r.height-((maxY-minY)*scale))/2;
+  applyTx();
+}
+
+// MOUSE
+cc.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey){e.preventDefault();const r=cc.getBoundingClientRect();zoomAtPoint(e.deltaY>0?-0.04:0.04,e.clientX-r.left,e.clientY-r.top);}},{passive:false});
+let drag=false,dsx,dsy,dpx,dpy;
+cc.addEventListener('mousedown',e=>{if(e.target.closest('.node'))return;drag=true;cc.style.cursor='grabbing';dsx=e.clientX;dsy=e.clientY;dpx=panX;dpy=panY;});
+window.addEventListener('mouseup',()=>{drag=false;cc.style.cursor='grab';});
+window.addEventListener('mousemove',e=>{if(!drag)return;e.preventDefault();panX=dpx+(e.clientX-dsx);panY=dpy+(e.clientY-dsy);applyTx();});
+
+// TOUCH
+let tD=false,tsx,tsy,tpx,tpy,lpd=0;
+cc.addEventListener('touchstart',e=>{if(e.target.closest('.node'))return;if(e.touches.length===1){tD=true;tsx=e.touches[0].clientX;tsy=e.touches[0].clientY;tpx=panX;tpy=panY;}if(e.touches.length===2){tD=false;lpd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);e.preventDefault();}},{passive:false});
+cc.addEventListener('touchmove',e=>{if(e.touches.length===1&&tD){e.preventDefault();panX=tpx+(e.touches[0].clientX-tsx);panY=tpy+(e.touches[0].clientY-tsy);applyTx();}if(e.touches.length===2){e.preventDefault();const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);const cx=(e.touches[0].clientX+e.touches[1].clientX)/2,cy=(e.touches[0].clientY+e.touches[1].clientY)/2;const r=cc.getBoundingClientRect();zoomAtPoint((d-lpd)*0.002,cx-r.left,cy-r.top);lpd=d;}},{passive:false});
+cc.addEventListener('touchend',()=>{tD=false;lpd=0;});
+
+// MINIMAP
+const mmC=document.getElementById('mmCanvas'),mmCtx=mmC.getContext('2d'),MW=400,MH=240,msx=MW/CW,msy=MH/CH;
+let mmSt=null;
+function buildMMS(){mmSt=document.createElement('canvas');mmSt.width=MW;mmSt.height=MH;const c=mmSt.getContext('2d');c.fillStyle='rgba(10,14,23,0.5)';c.fillRect(0,0,MW,MH);c.lineWidth=0.4;c.globalAlpha=0.12;conns.forEach(cn=>{const f=P[cn.f],t=P[cn.t];if(!f||!t)return;c.strokeStyle=DH[D[cn.f]?.cat]||'#334';c.beginPath();c.moveTo(f.x*msx,f.y*msy);c.lineTo(t.x*msx,t.y*msy);c.stroke();});c.globalAlpha=1;for(const[id,co] of Object.entries(D)){const p=P[id];if(!p)continue;c.fillStyle=DH[co.cat]||'#fff';c.beginPath();c.arc(p.x*msx,p.y*msy,2.5,0,Math.PI*2);c.fill();}c.fillStyle='#06b6d4';c.beginPath();c.arc(cX*msx,cY*msy,4,0,Math.PI*2);c.fill();}
+function drawMM(){if(!mmSt)buildMMS();mmCtx.clearRect(0,0,MW,MH);mmCtx.drawImage(mmSt,0,0);const r=cc.getBoundingClientRect();const vx=(-panX)/scale,vy=(-panY)/scale,vw=r.width/scale,vh=r.height/scale;mmCtx.strokeStyle='rgba(6,182,212,0.6)';mmCtx.lineWidth=1.2;mmCtx.strokeRect(vx*msx,vy*msy,vw*msx,vh*msy);mmCtx.fillStyle='rgba(6,182,212,0.05)';mmCtx.fillRect(vx*msx,vy*msy,vw*msx,vh*msy);}
+const mm=document.getElementById('minimap');let mmD=false;
+function mmN(e){const r=mm.getBoundingClientRect();const mx=(e.clientX-r.left)*(MW/r.width)/msx,my=(e.clientY-r.top)*(MH/r.height)/msy;const rect=cc.getBoundingClientRect();panX=-(mx*scale-rect.width/2);panY=-(my*scale-rect.height/2);applyTx();}
+mm.addEventListener('mousedown',e=>{e.preventDefault();e.stopPropagation();mmD=true;mmN(e);});
+window.addEventListener('mousemove',e=>{if(mmD)mmN(e);});window.addEventListener('mouseup',()=>{mmD=false;});
+mm.addEventListener('touchstart',e=>{e.preventDefault();mmD=true;mmN(e.touches[0]);},{passive:false});
+mm.addEventListener('touchmove',e=>{if(mmD){e.preventDefault();mmN(e.touches[0]);}},{passive:false});
+mm.addEventListener('touchend',()=>{mmD=false;});
+
+// DEEP LINK 2.0
+let vpT=null;function debouncedVP(){clearTimeout(vpT);vpT=setTimeout(()=>{try{const u=new URL(window.location);u.searchParams.set('x',Math.round(panX));u.searchParams.set('y',Math.round(panY));u.searchParams.set('z',Math.round(scale*100));history.replaceState(null,'',u);}catch(e){}},500);}
+function pushState(id){try{const u=new URL(window.location);if(id)u.searchParams.set('node',id);else u.searchParams.delete('node');u.searchParams.set('x',Math.round(panX));u.searchParams.set('y',Math.round(panY));u.searchParams.set('z',Math.round(scale*100));history.replaceState(null,'',u);}catch(e){}}
+function readDL(){try{const u=new URLSearchParams(window.location.search);return{node:u.get('node'),x:u.get('x')?parseInt(u.get('x')):null,y:u.get('y')?parseInt(u.get('y')):null,z:u.get('z')?parseInt(u.get('z'))/100:null};}catch(e){return{};}}
+
+// MODAL (with focus trap)
+let lastFocused=null;
+function buildTag(k){const co=D[k];if(!co)return`<span class="company-link-tag">${k}</span>`;return`<span class="company-link-tag" data-cat="${co.cat}" onclick="navTo('${k}')" title="${co.n} (${co.tc}) — ${co.mc}"><span class="tag-cat-dot" style="background:${DH[co.cat]}"></span>${co.t}<span class="tag-arrow">→</span></span>`;}
+function navTo(id){const m=document.getElementById('modal');m.style.transition='opacity 0.12s,transform 0.12s';m.style.opacity='0';m.style.transform='scale(0.95)';setTimeout(()=>{resetConns();m.style.transition='';m.style.opacity='';m.style.transform='';openModal(id);},120);}
+function yoy(g){if(!g)return '';return g>0?`<span class="yoy-badge yoy-up">+${g}%</span>`:`<span class="yoy-badge yoy-down">${g}%</span>`;}
+
+function openModal(id){
+  const co=D[id];if(!co)return;
+  lastFocused=document.activeElement;
+  hlConns(id);hideTT();pushState(id);
+  const ac=CC[co.cat];const mx=Math.max(...co.cx.map(c=>parseFloat(c.a.replace(/[^0-9.]/g,''))||0));
+  const rows=co.cx.map(c=>{const v=parseFloat(c.a.replace(/[^0-9.]/g,''))||0;const p=mx>0?(v/mx*100):0;return`<tr><td>${c.y}</td><td class="capex-bar-cell"><div class="capex-bar" style="width:0%;background:${ac};" data-t="${p}%"></div><span style="position:relative;z-index:1;font-weight:bold;">${c.a}</span>${yoy(c.g)}</td><td>${c.d}</td></tr>`;}).join('');
+  const ct=co.cust.length?co.cust.map(c=>buildTag(c)).join(''):'<span class="na-label"><span class="en-text">N/A — End-user</span><span class="tc-text">不適用</span></span>';
+  const st=co.sup.length?co.sup.map(s=>buildTag(s)).join(''):'<span class="na-label"><span class="en-text">N/A — Ultimate supplier</span><span class="tc-text">不適用——終極供應商</span></span>';
+  document.getElementById('modal').innerHTML=`
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-header"><span class="modal-ticker" style="color:${ac}">${co.t}</span><span class="modal-name">${co.n}</span></div><div class="modal-name-tc">${co.tc}</div>
+    <div class="modal-stats"><div class="modal-stat"><div class="modal-stat-label">Market Cap</div><div class="modal-stat-value" style="color:${ac}">${co.mc}</div></div><div class="modal-stat"><div class="modal-stat-label">AI Exposure</div><div class="modal-stat-value" style="color:${ac};font-size:12px;"><span class="en-text">${co.ai}</span><span class="tc-text">${co.aitc}</span></div></div><div class="modal-stat"><div class="modal-stat-label">Sector</div><div class="modal-stat-value" style="color:${ac};font-size:12px;text-transform:uppercase;">${co.cat}</div></div></div>
+    <div class="modal-section"><div class="modal-section-title"><span class="en-text">CAPEX / Revenue</span><span class="tc-text">資本開支 / 營收</span></div><table class="capex-table"><thead><tr><th>Period</th><th>Amount</th><th>Driver</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div style="display:flex;gap:16px;"><div class="modal-section" style="flex:1;"><div class="modal-section-title"><span class="en-text">Customers ▸</span><span class="tc-text">客戶 ▸</span></div><div class="customer-tags">${ct}</div></div><div class="modal-section" style="flex:1;"><div class="modal-section-title"><span class="en-text">Suppliers ▸</span><span class="tc-text">供應商 ▸</span></div><div class="customer-tags">${st}</div></div></div>
+    <div class="modal-section"><div class="modal-section-title"><span class="en-text">Thesis</span><span class="tc-text">論述</span></div><p><span class="en-text">${co.th}</span><span class="tc-text">${co.thtc}</span></p></div>`;
+  const overlay=document.getElementById('mo');overlay.classList.add('active');
+  cv.setAttribute('aria-hidden','true');
+  // Focus trap
+  setTimeout(()=>{const close=document.querySelector('.modal-close');if(close)close.focus();},100);
+  setTimeout(()=>{document.querySelectorAll('.capex-bar').forEach(b=>{b.style.width=b.getAttribute('data-t');});},60);
+}
+
+function closeModal(){
+  document.getElementById('mo').classList.remove('active');
+  cv.removeAttribute('aria-hidden');
+  resetConns();pushState(null);
+  if(lastFocused)lastFocused.focus();
+}
+
+function panToNode(id){const pos=P[id];if(!pos)return;const r=cc.getBoundingClientRect();panX=-(pos.x*scale-r.width/2);panY=-(pos.y*scale-r.height/2);applyTx();}
+
+function init(){
+  renderNodes();renderLabels();renderConns();buildLegend();
+  const dl=readDL();
+  if(dl.z&&dl.x!==null){scale=dl.z;panX=dl.x;panY=dl.y||0;applyTx();}else resetView();
+  if(dl.node&&D[dl.node])setTimeout(()=>{if(!dl.x)panToNode(dl.node);openModal(dl.node);},400);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+  document.addEventListener('gesturestart',e=>e.preventDefault());
+}
+</script>
+</body>
+</html>
