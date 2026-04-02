@@ -28,21 +28,21 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overf
 
 /* === HEADER === */
 .header{padding:16px 28px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;background:var(--bg);position:relative;z-index:200;}
-.header-left h1{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;background:linear-gradient(90deg,#06b6d4,#3b82f6,#a855f7,#ec4899,#f59e0b,#06b6d4);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradShift 6s linear infinite;}
+.header-left h1{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;background:linear-gradient(90deg,#06b6d4,#3b82f6,#a855f7,#ec4899,#f59e0b,#06b6d4);background-size:300% 100%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradShift 6s linear infinite;}
 @keyframes gradShift{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
-.header-left .subtitle{font-size:11px;color:var(--text-muted);margin-top:2px;font-family:'JetBrains Mono',monospace;}
+.header-left .subtitle{font-size:13px;color:var(--text-muted);margin-top:2px;font-family:'JetBrains Mono',monospace;}
 .header-right{display:flex;gap:10px;align-items:center;}
-.search-box input{background:var(--bg-card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:10px;outline:none;width:160px;transition:all 0.2s;}
+.search-box input{background:var(--bg-card);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;width:180px;transition:all 0.2s;}
 .search-box input:focus{border-color:var(--accent-cyan);box-shadow:0 0 8px rgba(6,182,212,0.15);}
-.lang-toggle{background:var(--bg-card);border:1px solid var(--border);color:var(--text-dim);padding:6px 10px;border-radius:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;transition:all 0.2s;}
+.lang-toggle{background:var(--bg-card);border:1px solid var(--border);color:var(--text-dim);padding:7px 12px;border-radius:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:12px;transition:all 0.2s;}
 .lang-toggle:hover{border-color:var(--accent-cyan);color:var(--accent-cyan);}
 
 /* === LEGEND (interactive) === */
 .legend-bar{display:flex;gap:10px;padding:5px 28px 6px;border-bottom:1px solid var(--border);flex-wrap:wrap;background:var(--bg);position:relative;z-index:200;}
-.legend-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid transparent;transition:all 0.2s;user-select:none;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;cursor:pointer;padding:3px 7px;border-radius:4px;border:1px solid transparent;transition:all 0.2s;user-select:none;}
 .legend-item:hover{color:var(--text);border-color:var(--border);}
 .legend-item.active{border-color:var(--border-active);color:var(--text);background:rgba(255,255,255,0.03);}
-.legend-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 
 /* === CANVAS === */
 .canvas-container{width:100%;height:calc(100vh - 88px);overflow:hidden;position:relative;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;}
@@ -60,15 +60,15 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overf
 .node.filtered-out{opacity:0.06!important;pointer-events:none;transform:scale(0.92)!important;}
 .node-center{width:200px;height:200px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#1a2744,#0a0e17);border:2px solid var(--accent-cyan);box-shadow:0 0 35px rgba(6,182,212,0.2),inset 0 0 25px rgba(6,182,212,0.07);animation:pulse 3s ease-in-out infinite;}
 @keyframes pulse{0%,100%{box-shadow:0 0 35px rgba(6,182,212,0.2),inset 0 0 25px rgba(6,182,212,0.07);}50%{box-shadow:0 0 55px rgba(6,182,212,0.35),inset 0 0 35px rgba(6,182,212,0.12);}}
-.node-center .node-ticker{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--accent-cyan);}
-.node-center .node-name{font-size:10px;color:var(--text-dim);margin-top:5px;line-height:1.4;padding:0 12px;}
-.node-cluster-label{position:absolute;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;z-index:4;padding:2px 8px;border-radius:4px;white-space:nowrap;background:rgba(10,14,23,0.7);backdrop-filter:blur(4px);}
-.node-company{width:138px;height:76px;padding:6px;}
-.cat-hyperscaler.node-company{width:146px;height:80px;border-width:2px;}
-.node-company .node-ticker{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;}
-.node-company .node-name{font-size:9px;color:var(--text-muted);margin-top:1px;}
-.node-company .node-mcap{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);margin-top:2px;}
-.capex-magnitude{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--accent-amber);margin-top:1px;font-weight:600;}
+.node-center .node-ticker{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:800;color:var(--accent-cyan);}
+.node-center .node-name{font-size:12px;color:var(--text-dim);margin-top:5px;line-height:1.4;padding:0 12px;}
+.node-cluster-label{position:absolute;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;z-index:4;padding:3px 10px;border-radius:4px;white-space:nowrap;background:rgba(10,14,23,0.7);backdrop-filter:blur(4px);text-shadow:0 1px 3px rgba(0,0,0,0.8);}
+.node-company{width:158px;height:88px;padding:6px;}
+.cat-hyperscaler.node-company{width:170px;height:94px;border-width:2px;}
+.node-company .node-ticker{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.8);}
+.node-company .node-name{font-size:11px;color:var(--text-muted);margin-top:1px;text-shadow:0 1px 2px rgba(0,0,0,0.6);}
+.node-company .node-mcap{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);margin-top:2px;text-shadow:0 1px 2px rgba(0,0,0,0.6);}
+.capex-magnitude{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-amber);margin-top:1px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,0.7);}
 
 .cat-hyperscaler{border-color:var(--accent-amber);}.cat-hyperscaler .node-ticker{color:var(--accent-amber);}
 .cat-gpu{border-color:var(--accent-green);}.cat-gpu .node-ticker{color:var(--accent-green);}
@@ -92,27 +92,27 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overf
 .modal-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--text-dim);width:30px;height:30px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.2s;}
 .modal-close:hover{background:rgba(239,68,68,0.1);border-color:var(--accent-red);color:var(--accent-red);}
 .modal-header{display:flex;align-items:baseline;gap:10px;margin-bottom:3px;}
-.modal-ticker{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:800;}
-.modal-name{font-size:13px;color:var(--text-dim);}
-.modal-name-tc{font-size:11px;color:var(--text-muted);margin-bottom:16px;}
+.modal-ticker{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:800;}
+.modal-name{font-size:16px;color:var(--text-dim);}
+.modal-name-tc{font-size:14px;color:var(--text-muted);margin-bottom:16px;}
 .modal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
-.modal-stat{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;padding:10px;}
-.modal-stat-label{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
-.modal-stat-value{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;}
+.modal-stat{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.modal-stat-label{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.modal-stat-value{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;}
 .modal-section{margin-bottom:16px;}
-.modal-section-title{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--border);}
-.modal-section p{font-size:12px;line-height:1.7;color:var(--text-dim);}
-.capex-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:11px;}
-.capex-table th{text-align:left;color:var(--text-muted);font-weight:600;padding:5px 8px;border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;letter-spacing:1px;}
+.modal-section-title{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--border);}
+.modal-section p{font-size:14px;line-height:1.7;color:var(--text-dim);}
+.capex-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:13px;}
+.capex-table th{text-align:left;color:var(--text-muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:1px;}
 .capex-table td{padding:7px 8px;color:var(--text-dim);border-bottom:1px solid rgba(30,41,59,0.5);}
 .capex-bar-cell{position:relative;width:38%;}
 .capex-bar{position:absolute;top:4px;left:0;height:calc(100% - 8px);border-radius:3px;opacity:0.2;transition:width 0.6s cubic-bezier(0.16,1,0.3,1);}
-.yoy-badge{display:inline-block;font-size:8px;padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:600;}
+.yoy-badge{display:inline-block;font-size:10px;padding:2px 5px;border-radius:3px;margin-left:5px;font-weight:600;}
 .yoy-up{background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);}
 .yoy-down{background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.2);}
 .customer-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
-.company-link-tag{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 8px;border-radius:5px;background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:4px;}
-.company-link-tag .tag-arrow{font-size:8px;opacity:0;transition:all 0.2s;}
+.company-link-tag{font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 10px;border-radius:5px;background:rgba(0,0,0,0.2);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;}
+.company-link-tag .tag-arrow{font-size:10px;opacity:0;transition:all 0.2s;}
 .company-link-tag:hover{transform:translateY(-1px);}.company-link-tag:hover .tag-arrow{opacity:1;}
 .company-link-tag[data-cat="hyperscaler"]:hover{border-color:var(--accent-amber);color:var(--accent-amber);background:rgba(245,158,11,0.06);}
 .company-link-tag[data-cat="gpu"]:hover{border-color:var(--accent-green);color:var(--accent-green);background:rgba(16,185,129,0.06);}
@@ -125,13 +125,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overf
 .company-link-tag[data-cat="oem"]:hover{border-color:var(--accent-teal);color:var(--accent-teal);background:rgba(20,184,166,0.06);}
 .company-link-tag[data-cat="sovereign"]:hover{border-color:var(--accent-gold);color:var(--accent-gold);background:rgba(212,160,23,0.06);}
 .tag-cat-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;}
-.na-label{color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:10px;font-style:italic;}
+.na-label{color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:12px;font-style:italic;}
 
-#tooltip{position:fixed;z-index:500;pointer-events:none;background:rgba(10,14,23,0.92);border:1px solid var(--border-active);border-radius:8px;padding:10px 14px;max-width:260px;backdrop-filter:blur(10px);box-shadow:0 6px 20px rgba(0,0,0,0.5);opacity:0;transform:translateY(4px);transition:opacity 0.2s,transform 0.2s;font-family:'JetBrains Mono',monospace;}
+#tooltip{position:fixed;z-index:500;pointer-events:none;background:rgba(10,14,23,0.92);border:1px solid var(--border-active);border-radius:8px;padding:12px 16px;max-width:280px;backdrop-filter:blur(10px);box-shadow:0 6px 20px rgba(0,0,0,0.5);opacity:0;transform:translateY(4px);transition:opacity 0.2s,transform 0.2s;font-family:'JetBrains Mono',monospace;}
 #tooltip.visible{opacity:1;transform:translateY(0);}
-#tooltip .tt-ticker{font-size:13px;font-weight:800;margin-bottom:2px;}
-#tooltip .tt-capex{font-size:10px;color:var(--accent-amber);margin-bottom:3px;}
-#tooltip .tt-thesis{font-size:9px;color:var(--text-dim);line-height:1.4;}
+#tooltip .tt-ticker{font-size:15px;font-weight:800;margin-bottom:3px;}
+#tooltip .tt-capex{font-size:12px;color:var(--accent-amber);margin-bottom:4px;}
+#tooltip .tt-thesis{font-size:11px;color:var(--text-dim);line-height:1.5;}
 
 #minimap{position:fixed;bottom:24px;left:24px;width:200px;height:120px;background:rgba(10,14,23,0.85);border:1px solid var(--border);border-radius:8px;z-index:100;overflow:hidden;backdrop-filter:blur(4px);box-shadow:0 4px 12px rgba(0,0,0,0.4);cursor:crosshair;touch-action:none;}
 #minimap canvas{width:100%;height:100%;pointer-events:none;}
@@ -139,7 +139,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overf
 .zoom-controls{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:5px;z-index:100;}
 .zoom-btn{width:34px;height:34px;background:rgba(17,24,39,0.85);backdrop-filter:blur(4px);border:1px solid var(--border);color:var(--text-dim);border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;font-family:'JetBrains Mono',monospace;transition:all 0.2s;box-shadow:0 3px 10px rgba(0,0,0,0.3);}
 .zoom-btn:hover{border-color:var(--accent-cyan);color:var(--accent-cyan);}
-.zoom-pct{text-align:center;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:-1px;}
+.zoom-pct{text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:-1px;}
 ::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 .tc-text{display:none;}body.lang-tc .en-text{display:none;}body.lang-tc .tc-text{display:inline;}
 </style>
@@ -185,8 +185,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overf
 <div class="zoom-controls">
   <button class="zoom-btn" onclick="zoomAt(0.08)">+</button>
   <button class="zoom-btn" onclick="zoomAt(-0.08)">−</button>
-  <button class="zoom-btn" onclick="fitToView()" title="Fit all" style="font-size:12px;">⛶</button>
-  <button class="zoom-btn" onclick="resetView()" style="font-size:12px;">⟲</button>
+  <button class="zoom-btn" onclick="fitToView()" title="Fit all" style="font-size:14px;">⛶</button>
+  <button class="zoom-btn" onclick="resetView()" style="font-size:14px;">⟲</button>
   <div class="zoom-pct" id="zoomPct">50%</div>
 </div>
 
@@ -194,10 +194,12 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overf
 // ═══════════════════════════════════
 // PASSWORD GATE
 // ═══════════════════════════════════
-const PASSWORD='23008133';
-function tryUnlock(){
+const PW_HASH='bebc79734038e684e2d9bd00f8a0bcebb96fbffbdb699ffd076732806fe1cde0';
+async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function tryUnlock(){
   const inp=document.getElementById('gatePw');
-  if(inp.value===PASSWORD){document.getElementById('gate').classList.add('hidden');setTimeout(()=>init(),300);}
+  const h=await sha256(inp.value);
+  if(h===PW_HASH){document.getElementById('gate').classList.add('hidden');setTimeout(()=>init(),300);}
   else{inp.classList.add('error');inp.value='';setTimeout(()=>inp.classList.remove('error'),500);}
 }
 document.getElementById('gatePw').addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
@@ -244,6 +246,10 @@ const D={
   VST:{t:'VST',n:'Vistra',tc:'Vistra',cat:'power',mc:'$42B',ai:'~25%',aitc:'約25%',cx:[{y:'2024',a:'$18.4B',d:'Rev',g:0},{y:'2025',a:'$20B',d:'Nuclear',g:9},{y:'2026E',a:'$22B+',d:'PPA repricing',g:10}],cust:['MSFT','AMZN'],sup:[],th:'Nuclear baseload.',thtc:'核電基載。'},
   ETN:{t:'ETN',n:'Eaton',tc:'伊頓',cat:'power',mc:'$115B',ai:'~30%',aitc:'約30%',cx:[{y:'2024',a:'$24.3B',d:'Rev',g:0},{y:'2025',a:'$26.5B',d:'+11%',g:11},{y:'2026E',a:'$29B+',d:'Shortage',g:9}],cust:['MSFT','GOOGL','AMZN'],sup:[],th:'Transformers grid-to-rack.',thtc:'變壓器電網到機架。'},
   VRT:{t:'VRT',n:'Vertiv',tc:'維諦',cat:'cooling',mc:'$35B',ai:'~55%',aitc:'約55%',cx:[{y:'2024',a:'$7.6B',d:'Rev',g:0},{y:'2025',a:'$9.5B+',d:'+28%',g:25},{y:'2026E',a:'$11B+',d:'Liquid cooling',g:16}],cust:['DELL','QUANTA','WIWYNN','MSFT'],sup:[],th:'NVDA liquid cooling ref. TDP>1000W.',thtc:'NVDA液冷參考設計。TDP>1000W。'},
+  SMCI:{t:'SMCI',n:'Super Micro',tc:'美超微',cat:'oem',mc:'$22B',ai:'~85% AI servers',aitc:'約85% AI伺服器',cx:[{y:'FY2024',a:'$15B',d:'Rev',g:0},{y:'FY2025',a:'$24B',d:'+60% AI racks',g:60},{y:'FY2026E',a:'$30B+',d:'DLC leadership',g:25}],cust:['MSFT','META','ORCL'],sup:['NVDA','VRT'],th:'Direct-liquid-cooling pioneer. Fastest time-to-market for new GPU platforms. Under DOJ/audit scrutiny but revenue surging.',thtc:'直接液冷先驅。新GPU平台最快上市速度。受DOJ/審計審查但營收飆升。'},
+  CLS:{t:'CLS',n:'Celestica',tc:'Celestica',cat:'oem',mc:'$12B',ai:'~45% AI/cloud',aitc:'約45% AI/雲端',cx:[{y:'2024',a:'$9.6B',d:'Rev',g:0},{y:'2025',a:'$12B',d:'+25% AI ramp',g:25},{y:'2026E',a:'$15B+',d:'HPS growth',g:25}],cust:['GOOGL','AMZN','META'],sup:['NVDA','COHR'],th:'High-growth cloud ODM. Hardware Platform Solutions (HPS) segment doubling. Networking + storage for hyperscalers.',thtc:'高成長雲端代工。硬件平台解決方案（HPS）業務倍增。為超大規模客戶提供網路+存儲。'},
+  NVT:{t:'NVT',n:'nVent Electric',tc:'nVent',cat:'cooling',mc:'$12B',ai:'~30% DC thermal',aitc:'約30% DC散熱',cx:[{y:'2024',a:'$3.0B',d:'Rev',g:0},{y:'2025',a:'$3.6B',d:'+30% organic',g:20},{y:'2026E',a:'$4.2B+',d:'Liquid cooling enclosures',g:17}],cust:['DELL','QUANTA','SMCI'],sup:[],th:'Enclosures, precision cooling & rack thermal management. Acquired CPI (Chatsworth Products) for DC infrastructure.',thtc:'機櫃、精密散熱與機架熱管理。收購CPI(Chatsworth Products)強化DC基建。'},
+  CCJ:{t:'CCJ',n:'Cameco',tc:'Cameco',cat:'power',mc:'$28B',ai:'Uranium fuel supply',aitc:'鈾燃料供應',cx:[{y:'2024',a:'$2.6B',d:'Rev',g:0},{y:'2025',a:'$3.2B',d:'Uranium price surge',g:23},{y:'2026E',a:'$3.8B+',d:'Contract repricing',g:19}],cust:['VST'],sup:[],th:'World\'s largest publicly traded uranium producer. Nuclear renaissance for AI data center baseload. Long-term contract repricing at 2-3x historical levels.',thtc:'全球最大上市鈾生產商。AI數據中心基載的核能復興。長期合約以歷史水平2-3倍重新定價。'},
 };
 
 // LAYOUT
@@ -254,7 +260,7 @@ const P={
   SOV_AI:{x:350,y:100},
   MSFT:{x:cX-520,y:120},GOOGL:{x:cX-200,y:70},AMZN:{x:cX+160,y:70},META:{x:cX+480,y:120},ORCL:{x:cX+760,y:220},
   // OEM/ODM row
-  DELL:{x:cX-500,y:360},HPE:{x:cX-280,y:340},QUANTA:{x:cX,y:320},FOXCONN:{x:cX+280,y:340},WIWYNN:{x:cX+500,y:360},
+  DELL:{x:cX-560,y:360},HPE:{x:cX-340,y:340},CLS:{x:cX-140,y:320},QUANTA:{x:cX+80,y:320},FOXCONN:{x:cX+300,y:340},WIWYNN:{x:cX+500,y:360},SMCI:{x:cX+720,y:340},
   // GPU row
   NVDA:{x:cX-300,y:560},AMD:{x:cX+60,y:540},AVGO:{x:cX+380,y:560},
   // Foundry
@@ -266,7 +272,7 @@ const P={
   // Networking
   COHR:{x:280,y:540},MRVL:{x:250,y:730},ALAB:{x:280,y:920},CRDO:{x:310,y:1110},
   // Power + Cooling
-  GEV:{x:2900,y:420},VST:{x:2920,y:610},ETN:{x:2900,y:800},VRT:{x:2950,y:1040},
+  GEV:{x:2900,y:420},VST:{x:2920,y:610},ETN:{x:2900,y:800},CCJ:{x:2960,y:950},VRT:{x:2950,y:1100},NVT:{x:2900,y:1260},
 };
 
 const conns=[
@@ -275,6 +281,8 @@ const conns=[
   {f:'GOOGL',t:'QUANTA',c:'var(--accent-amber)'},{f:'AMZN',t:'QUANTA',c:'var(--accent-amber)'},{f:'AMZN',t:'WIWYNN',c:'var(--accent-amber)'},
   {f:'META',t:'QUANTA',c:'var(--accent-amber)'},{f:'META',t:'FOXCONN',c:'var(--accent-amber)'},
   {f:'MSFT',t:'QUANTA',c:'var(--accent-amber)'},
+  {f:'MSFT',t:'SMCI',c:'var(--accent-amber)'},{f:'META',t:'SMCI',c:'var(--accent-amber)'},{f:'ORCL',t:'SMCI',c:'var(--accent-amber)'},
+  {f:'GOOGL',t:'CLS',c:'var(--accent-amber)'},{f:'AMZN',t:'CLS',c:'var(--accent-amber)'},{f:'META',t:'CLS',c:'var(--accent-amber)'},
   // Sovereign → OEM
   {f:'SOV_AI',t:'DELL',c:'var(--accent-gold)'},{f:'SOV_AI',t:'HPE',c:'var(--accent-gold)'},{f:'SOV_AI',t:'NVDA',c:'var(--accent-gold)'},
   // Hyperscalers → direct GPU (some)
@@ -286,9 +294,15 @@ const conns=[
   {f:'AMZN',t:'MRVL',c:'var(--accent-amber)'},{f:'AMZN',t:'ALAB',c:'var(--accent-amber)'},
   // OEM/ODM → GPU
   {f:'DELL',t:'NVDA',c:'var(--accent-teal)'},{f:'HPE',t:'NVDA',c:'var(--accent-teal)'},{f:'QUANTA',t:'NVDA',c:'var(--accent-teal)'},{f:'FOXCONN',t:'NVDA',c:'var(--accent-teal)'},{f:'WIWYNN',t:'NVDA',c:'var(--accent-teal)'},
+  {f:'SMCI',t:'NVDA',c:'var(--accent-teal)'},{f:'CLS',t:'NVDA',c:'var(--accent-teal)'},
   {f:'DELL',t:'AMD',c:'var(--accent-teal)'},{f:'HPE',t:'AMD',c:'var(--accent-teal)'},
   // OEM/ODM → Cooling/Networking
   {f:'QUANTA',t:'COHR',c:'var(--accent-teal)'},{f:'QUANTA',t:'VRT',c:'var(--accent-teal)'},{f:'WIWYNN',t:'VRT',c:'var(--accent-teal)'},
+  {f:'SMCI',t:'VRT',c:'var(--accent-teal)'},{f:'CLS',t:'COHR',c:'var(--accent-teal)'},
+  // Cooling supply chain
+  {f:'NVT',t:'DELL',c:'var(--accent-pink)'},{f:'NVT',t:'QUANTA',c:'var(--accent-pink)'},{f:'NVT',t:'SMCI',c:'var(--accent-pink)'},
+  // Nuclear fuel chain
+  {f:'CCJ',t:'VST',c:'var(--accent-orange)'},
   // GPU → Foundry
   {f:'NVDA',t:'TSM',c:'var(--accent-green)'},{f:'AMD',t:'TSM',c:'var(--accent-green)'},{f:'AVGO',t:'TSM',c:'var(--accent-green)'},
   // GPU → Memory
@@ -308,14 +322,14 @@ const conns=[
 const CL=[
   {t:'HYPERSCALERS ($660B+)',tc:'雲端巨頭 ($660B+)',x:cX,y:12,c:'var(--accent-amber)'},
   {t:'SOVEREIGN AI & ENTERPRISE',tc:'主權AI與企業',x:350,y:40,c:'var(--accent-gold)'},
-  {t:'OEM / ODM SERVER INTEGRATORS',tc:'伺服器 OEM / ODM 整合商',x:cX,y:260,c:'var(--accent-teal)'},
+  {t:'OEM / ODM SERVER INTEGRATORS',tc:'伺服器 OEM / ODM 整合商',x:cX-480,y:275,c:'var(--accent-teal)'},
   {t:'GPU / ACCELERATORS',tc:'GPU / 加速器',x:cX-300,y:490,c:'var(--accent-green)'},
   {t:'FOUNDRY',tc:'晶圓代工',x:cX+120,y:880,c:'var(--accent-blue)'},
   {t:'MEMORY',tc:'記憶體',x:cX+580,y:830,c:'var(--accent-purple)'},
   {t:'EQUIPMENT — SELLING SHOVELS',tc:'半導體設備 — 賣鏟子',x:cX,y:1210,c:'var(--accent-red)'},
   {t:'NETWORKING',tc:'網路互連',x:260,y:440,c:'var(--accent-cyan)'},
   {t:'POWER',tc:'電力',x:2900,y:340,c:'var(--accent-orange)'},
-  {t:'COOLING',tc:'散熱',x:2930,y:970,c:'var(--accent-pink)'},
+  {t:'COOLING',tc:'散熱',x:2930,y:1040,c:'var(--accent-pink)'},
 ];
 
 let scale=0.45,lang='en',panX=0,panY=0,activeCatFilter=null;
@@ -335,7 +349,7 @@ function buildLegend(){
   });
   // flow indicator
   const fi=document.createElement('div');fi.className='legend-item';fi.style.marginLeft='auto';fi.style.gap='6px';fi.style.cursor='default';
-  fi.innerHTML=`<svg width="30" height="7"><line x1="0" y1="3.5" x2="22" y2="3.5" stroke="var(--text-muted)" stroke-width="1.2" stroke-dasharray="4 2"><animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.7s" repeatCount="indefinite"/></line><polygon points="22,0 30,3.5 22,7" fill="var(--text-muted)" opacity="0.5"/></svg><span style="font-size:8px;">$ flow</span>`;
+  fi.innerHTML=`<svg width="30" height="7"><line x1="0" y1="3.5" x2="22" y2="3.5" stroke="var(--text-muted)" stroke-width="1.2" stroke-dasharray="4 2"><animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.7s" repeatCount="indefinite"/></line><polygon points="22,0 30,3.5 22,7" fill="var(--text-muted)" opacity="0.5"/></svg><span style="font-size:10px;">$ flow</span>`;
   bar.appendChild(fi);
 }
 
@@ -365,7 +379,7 @@ function renderNodes(){
   const cd=document.createElement('div');cd.className='node node-center';cd.style.left=(cX-100)+'px';cd.style.top=(cY-100)+'px';
   cd.innerHTML=`<div class="node-ticker">AI CAPEX 2026</div><div class="node-name"><span class="en-text">$760B+ Total AI Spend<br>Hyperscalers + Sovereign + Enterprise</span><span class="tc-text">$760B+ AI 總支出<br>雲端巨頭 + 主權 + 企業</span></div>`;
   cv.appendChild(cd);
-  for(const[id,co] of Object.entries(D)){const pos=P[id];if(!pos)continue;const d=document.createElement('div');d.className=`node node-company cat-${co.cat}`;const hw=co.cat==='hyperscaler'?73:69,hh=co.cat==='hyperscaler'?40:38;d.style.left=(pos.x-hw)+'px';d.style.top=(pos.y-hh)+'px';d.dataset.id=id;d.tabIndex=0;d.onclick=()=>openModal(id);d.onkeydown=e=>{if(e.key==='Enter')openModal(id);};d.onmouseenter=e=>{hlConns(id);showTT(e,id);};d.onmouseleave=()=>{resetConns();hideTT();};d.onmousemove=e=>moveTT(e);const cl=co.cx[2]?co.cx[2].a:'';d.innerHTML=`<div class="node-ticker">${co.t}</div><div class="node-name"><span class="en-text">${co.n}</span><span class="tc-text">${co.tc}</span></div><div class="node-mcap">${co.mc}</div>${cl?`<div class="capex-magnitude">${cl}</div>`:''}`;cv.appendChild(d);}
+  for(const[id,co] of Object.entries(D)){const pos=P[id];if(!pos)continue;const d=document.createElement('div');d.className=`node node-company cat-${co.cat}`;const hw=co.cat==='hyperscaler'?85:79,hh=co.cat==='hyperscaler'?47:44;d.style.left=(pos.x-hw)+'px';d.style.top=(pos.y-hh)+'px';d.dataset.id=id;d.tabIndex=0;d.onclick=()=>openModal(id);d.onkeydown=e=>{if(e.key==='Enter')openModal(id);};d.onmouseenter=e=>{hlConns(id);showTT(e,id);};d.onmouseleave=()=>{resetConns();hideTT();};d.onmousemove=e=>moveTT(e);const cl=co.cx[2]?co.cx[2].a:'';d.innerHTML=`<div class="node-ticker">${co.t}</div><div class="node-name"><span class="en-text">${co.n}</span><span class="tc-text">${co.tc}</span></div><div class="node-mcap">${co.mc}</div>${cl?`<div class="capex-magnitude">${cl}</div>`:''}`;cv.appendChild(d);}
 }
 
 function renderLabels(){document.querySelectorAll('.node-cluster-label').forEach(e=>e.remove());CL.forEach(cl=>{const d=document.createElement('div');d.className='node-cluster-label';d.style.left=cl.x+'px';d.style.top=cl.y+'px';d.style.color=cl.c;d.style.borderBottom=`2px solid ${cl.c}`;d.textContent=lang==='tc'?cl.tc:cl.t;cv.appendChild(d);});}
@@ -451,7 +465,7 @@ function openModal(id){
   document.getElementById('modal').innerHTML=`
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-header"><span class="modal-ticker" style="color:${ac}">${co.t}</span><span class="modal-name">${co.n}</span></div><div class="modal-name-tc">${co.tc}</div>
-    <div class="modal-stats"><div class="modal-stat"><div class="modal-stat-label">Market Cap</div><div class="modal-stat-value" style="color:${ac}">${co.mc}</div></div><div class="modal-stat"><div class="modal-stat-label">AI Exposure</div><div class="modal-stat-value" style="color:${ac};font-size:12px;"><span class="en-text">${co.ai}</span><span class="tc-text">${co.aitc}</span></div></div><div class="modal-stat"><div class="modal-stat-label">Sector</div><div class="modal-stat-value" style="color:${ac};font-size:12px;text-transform:uppercase;">${co.cat}</div></div></div>
+    <div class="modal-stats"><div class="modal-stat"><div class="modal-stat-label">Market Cap</div><div class="modal-stat-value" style="color:${ac}">${co.mc}</div></div><div class="modal-stat"><div class="modal-stat-label">AI Exposure</div><div class="modal-stat-value" style="color:${ac};font-size:14px;"><span class="en-text">${co.ai}</span><span class="tc-text">${co.aitc}</span></div></div><div class="modal-stat"><div class="modal-stat-label">Sector</div><div class="modal-stat-value" style="color:${ac};font-size:14px;text-transform:uppercase;">${co.cat}</div></div></div>
     <div class="modal-section"><div class="modal-section-title"><span class="en-text">CAPEX / Revenue</span><span class="tc-text">資本開支 / 營收</span></div><table class="capex-table"><thead><tr><th>Period</th><th>Amount</th><th>Driver</th></tr></thead><tbody>${rows}</tbody></table></div>
     <div style="display:flex;gap:16px;"><div class="modal-section" style="flex:1;"><div class="modal-section-title"><span class="en-text">Customers ▸</span><span class="tc-text">客戶 ▸</span></div><div class="customer-tags">${ct}</div></div><div class="modal-section" style="flex:1;"><div class="modal-section-title"><span class="en-text">Suppliers ▸</span><span class="tc-text">供應商 ▸</span></div><div class="customer-tags">${st}</div></div></div>
     <div class="modal-section"><div class="modal-section-title"><span class="en-text">Thesis</span><span class="tc-text">論述</span></div><p><span class="en-text">${co.th}</span><span class="tc-text">${co.thtc}</span></p></div>`;
@@ -478,6 +492,9 @@ function init(){
   if(dl.node&&D[dl.node])setTimeout(()=>{if(!dl.x)panToNode(dl.node);openModal(dl.node);},400);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
   document.addEventListener('gesturestart',e=>e.preventDefault());
+  // Resize handler — recalc bounds & minimap on viewport change / rotation
+  let resizeT=null;
+  window.addEventListener('resize',()=>{clearTimeout(resizeT);resizeT=setTimeout(()=>{mmSt=null;applyTx();},200);});
 }
 </script>
 </body>
